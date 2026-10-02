@@ -68,11 +68,10 @@ after changes.
 
 ## Status and open items
 
-- The first version (commit `20050af`) passes lint, typecheck and unit tests but has not yet been
-  run in Foundry. First check that Core accepts the registration and default layout.
+- The first version works in Foundry v14 with Token Action HUD Core 2.1.2.
 - The HUD doesn't refresh when a spell source on another actor (Allied Spirit, bound spirit)
   changes. A hook like `rqg.spellSourcesChanged` in the system would fix this.
-- There is no GitHub repo yet (planned: `sun-dragon-cult/fvtt-module-token-action-hud-rqg`).
+- GitHub: https://github.com/sun-dragon-cult/fvtt-module-token-action-hud-rqg (MIT).
 - Ideas for later: hit locations and HP, rune and magic point readouts, strike ranks,
   experience session, translations.
 - The old all-in-one Token Action HUD fork in `../fvtt-tokenactionhud` is obsolete and not used.
