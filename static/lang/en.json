@@ -1,0 +1,21 @@
+{
+  "tokenActionHud": {
+    "rqg": {
+      "characteristics": "Characteristics",
+      "magic": "Magic",
+      "passions": "Passions",
+      "passionsAndRunes": "Passions & Runes",
+      "runes": "Runes",
+      "skills": "Skills",
+      "statusEffects": "Status Effects",
+      "weapons": "Weapons",
+      "weaponUnusable": "Below the STR or DEX requirement for this use of the weapon",
+      "settings": {
+        "showUnequippedWeapons": {
+          "name": "Show unequipped weapons",
+          "hint": "Also show weapons that are carried but not equipped."
+        }
+      }
+    }
+  }
+}
