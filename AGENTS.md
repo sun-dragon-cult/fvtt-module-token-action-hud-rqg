@@ -74,8 +74,15 @@ after changes.
 ## Status and open items
 
 - The first version works in Foundry v14 with Token Action HUD Core 2.1.2.
-- The HUD doesn't refresh when a spell source on another actor (Allied Spirit, bound spirit)
-  changes. A hook like `rqg.spellSourcesChanged` in the system would fix this.
+- Waiting on the system's public API work (epic sun-dragon-cult/fvtt-system-rqg#1133):
+  - #1137: a hook when an actor's spell or point sources change. Until then the HUD doesn't refresh
+    when an Allied Spirit, bound spirit or matrix on another actor changes.
+  - #1135: spell source ids. Spell subgroups for Allied Spirits and bound spirits are keyed by
+    name until then (`spiritSourceGroupId` in `src/build-actions.ts`).
+  - #1136: Magic Points per spell source, to show on each spirit magic subgroup.
+  - #1132: public roll methods and hooks. Switch `src/roll-handler.ts` to them once they exist.
+- Release order: RQG 6.2.0 first, then a GitHub release of this module, then register it as a
+  Foundry package.
 - GitHub: https://github.com/sun-dragon-cult/fvtt-module-token-action-hud-rqg (MIT).
 - Ideas for later: hit locations and HP, rune and magic point readouts, strike ranks,
   experience session, translations.
