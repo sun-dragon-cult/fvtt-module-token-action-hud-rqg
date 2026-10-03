@@ -5,6 +5,7 @@ import {
   buildStatusEffectActions,
   buildWeaponActions,
   type GroupedActions,
+  type SpellGroups,
 } from "./build-actions";
 import { getSetting } from "./settings";
 import type { TahCoreModule } from "./types/tah-core";
@@ -16,6 +17,7 @@ export function createActionHandler(coreModule: TahCoreModule) {
     /** Called by Core whenever the HUD is (re)built. */
     async buildSystemActions(_groupIds: string[]): Promise<void> {
       const grouped: GroupedActions = new Map();
+      this.derivedGroupIds.clear();
 
       if (this.actor) {
         this.buildSingleActorActions(this.actor, grouped);
@@ -24,7 +26,26 @@ export function createActionHandler(coreModule: TahCoreModule) {
       }
 
       for (const [groupId, actions] of grouped) {
-        this.addActions(actions, { id: groupId, type: "system" });
+        const type = this.derivedGroupIds.has(groupId) ? "system-derived" : "system";
+        this.addActions(actions, { id: groupId, type });
+      }
+    }
+
+    /** Ids of the groups added for the current actor, see `addSpellGroups` */
+    private derivedGroupIds = new Set<string>();
+
+    /** Adds the cult and spell source subgroups, and magic and rune points as group info. */
+    private addSpellGroups({ subgroups, groupInfo }: SpellGroups): void {
+      for (const { id, name, parentId, info1 } of subgroups) {
+        this.addGroup(
+          { id, name, listName: `Group: ${name}`, type: "system-derived", info1 },
+          { id: parentId, type: "system" },
+          true,
+        );
+        this.derivedGroupIds.add(id);
+      }
+      for (const [id, info1] of groupInfo) {
+        this.addGroupInfo({ id, type: "system", info: { info1 } });
       }
     }
 
@@ -40,10 +61,12 @@ export function createActionHandler(coreModule: TahCoreModule) {
         grouped,
       );
       buildAbilityActions(query.abilities(actorRef), grouped);
-      buildSpellActions(query.spells(actorRef), grouped);
+      const attributes = query.attributes(actorRef);
+      const spellGroups = buildSpellActions(query.spells(actorRef), attributes, grouped);
+      this.addSpellGroups(spellGroups);
       buildCharacteristicActions(
         query.characteristics(actorRef),
-        query.attributes(actorRef).reputation,
+        attributes.reputation,
         localize,
         grouped,
       );

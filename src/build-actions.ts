@@ -7,11 +7,12 @@ import {
 } from "./constants";
 import type {
   AbilityInfo,
+  ActorAttributesInfo,
   CastableSpell,
   CharacteristicName,
   WeaponUsageInfo,
 } from "./types/rqg-api";
-import type { TahActionData } from "./types/tah-core";
+import type { TahActionData, TahInfo } from "./types/tah-core";
 
 export type Localize = (key: string) => string;
 
@@ -118,27 +119,112 @@ export function spellKey(spell: CastableSpell): string {
     : `${spell.uuid}`;
 }
 
-export function buildSpellActions(spells: CastableSpell[], grouped: GroupedActions): void {
+/** A group that only exists for some actors, added below one of the layout's groups. */
+export type DerivedGroup = {
+  id: string;
+  name: string;
+  parentId: string;
+  info1?: TahInfo;
+};
+
+/** Groups and group info the spells need besides the layout's own groups. */
+export type SpellGroups = {
+  subgroups: DerivedGroup[];
+  groupInfo: Map<string, TahInfo>;
+};
+
+function points(value: number | null, max: number | null): TahInfo | undefined {
+  return value != null && max != null ? { text: `${value}/${max}` } : undefined;
+}
+
+/**
+ * Rune magic gets a subgroup per cult, showing the cult's rune points. Spirit magic from the
+ * actor itself goes straight in the spirit magic group, which shows the magic points. Spells from
+ * an Allied Spirit, bound spirit or matrix get a subgroup per source.
+ */
+export function buildSpellActions(
+  spells: CastableSpell[],
+  attributes: Pick<ActorAttributesInfo, "magicPoints" | "runePoints">,
+  grouped: GroupedActions,
+): SpellGroups {
+  const subgroups = new Map<string, DerivedGroup>();
+  for (const cult of attributes.runePoints) {
+    subgroups.set(cultGroupId(cult.cultId), {
+      id: cultGroupId(cult.cultId),
+      name: cult.cultName,
+      parentId: GROUP.runeMagic.id,
+      info1: points(cult.value, cult.max),
+    });
+  }
+
   for (const spell of spells) {
-    const name = spell.sourceName ? `${spell.name} (${spell.sourceName})` : spell.name;
-    const points = `${spell.points}${spell.isVariable ? "+" : ""}`;
     const isRuneMagic = spell.type === "runeMagic";
+    let groupId: string = isRuneMagic ? GROUP.runeMagic.id : GROUP.spiritMagic.id;
+    let name = spell.name;
+
+    if (isRuneMagic) {
+      if (spell.cultId) {
+        groupId = cultGroupId(spell.cultId);
+        if (!subgroups.has(groupId)) {
+          subgroups.set(groupId, {
+            id: groupId,
+            name: spell.cultName ?? spell.cultId,
+            parentId: GROUP.runeMagic.id,
+          });
+        }
+      }
+      if (spell.sourceName) {
+        name = `${spell.name} (${spell.sourceName})`;
+      }
+    } else if (spell.source !== "own") {
+      groupId = spiritSourceGroupId(spell);
+      if (!subgroups.has(groupId)) {
+        subgroups.set(groupId, {
+          id: groupId,
+          name: spell.sourceName ?? spell.source,
+          parentId: GROUP.spiritMagic.id,
+        });
+      }
+    }
+
     addTo(
       grouped,
-      isRuneMagic ? GROUP.runeMagic.id : GROUP.spiritMagic.id,
+      groupId,
       action(
         isRuneMagic ? ACTION_TYPE.runeMagic : ACTION_TYPE.spiritMagic,
         spellKey(spell),
         {
           name,
           img: spell.img,
-          info1: { text: points },
-          info2: isRuneMagic && spell.cultName ? { text: spell.cultName } : undefined,
+          info1: { text: `${spell.points}${spell.isVariable ? "+" : ""}` },
         },
         spell.uuid ? { itemUuid: spell.uuid } : {},
       ),
     );
   }
+
+  const groupInfo = new Map<string, TahInfo>();
+  const magicPoints = points(attributes.magicPoints.value, attributes.magicPoints.max);
+  if (magicPoints) {
+    groupInfo.set(GROUP.spiritMagic.id, magicPoints);
+  }
+
+  return {
+    // Cults without any spells to cast are left out
+    subgroups: [...subgroups.values()].filter((g) => grouped.has(g.id)),
+    groupInfo,
+  };
+}
+
+function cultGroupId(cultId: string): string {
+  return `rune-magic-cult-${cultId}`;
+}
+
+/** Matrices are told apart by item id, spirits only by name since they have no id in the API. */
+function spiritSourceGroupId(spell: CastableSpell): string {
+  const key =
+    spell.matrix?.itemId ?? (spell.sourceName ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-");
+  return `spirit-magic-${spell.source}-${key}`;
 }
 
 /** Characteristics show their ×5 chance when values are known (a single actor). */

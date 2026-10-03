@@ -19,12 +19,19 @@ export type TahActionData = {
   system: Record<string, unknown>;
 };
 
-export type TahGroupData = { id: string; type?: "system" | "custom" | "core" };
+export type TahGroupData = {
+  id: string;
+  type?: "system" | "system-derived" | "custom" | "core";
+};
+
+/** Per group settings users can change in the HUD. `style` "tab" shows subgroups as tabs. */
+export type TahGroupSettings = { style?: "tab" | "list"; showTitle?: boolean };
 
 export type TahGroup = TahGroupData & {
   name: string;
   listName?: string;
   nestId?: string;
+  settings?: TahGroupSettings;
   groups?: TahGroup[];
 };
 
@@ -36,6 +43,15 @@ export interface TahActionHandler {
   actors: Actor[];
   tokens: Token[];
   addActions(actionsData: TahActionData[], groupData: TahGroupData): void;
+  /** Adds a group below every group matching `parentGroupData`. */
+  addGroup(
+    groupData: TahGroupData & { name: string; listName?: string; info1?: TahInfo },
+    parentGroupData: TahGroupData,
+    update?: boolean,
+  ): void;
+  addGroupInfo(
+    groupData: TahGroupData & { info: { info1?: TahInfo; info2?: TahInfo; info3?: TahInfo } },
+  ): void;
 }
 
 export interface TahRollHandler {

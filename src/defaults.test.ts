@@ -19,6 +19,7 @@ describe("getDefaults", () => {
       "magic_spirit-magic",
       "magic_rune-magic",
     ]);
+    expect(layout[2]?.groups?.map((g) => g.settings?.style)).toEqual(["tab", "tab"]);
   });
 
   it("lists every layout group once, without nest ids", () => {

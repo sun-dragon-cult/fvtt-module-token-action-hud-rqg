@@ -121,33 +121,88 @@ describe("buildWeaponActions", () => {
 });
 
 describe("buildSpellActions", () => {
-  it("puts spirit and rune magic in their own groups, naming external sources", () => {
+  const attributes = {
+    magicPoints: { value: 9, max: 14 },
+    runePoints: [
+      { cultId: "c1", cultName: "Orlanth", value: 3, max: 5 },
+      { cultId: "c2", cultName: "Ernalda", value: 1, max: 1 },
+    ],
+  };
+
+  it("puts the actor's own spirit magic in the spirit magic group, with magic points", () => {
     const grouped: GroupedActions = new Map();
-    buildSpellActions(
+    const { groupInfo } = buildSpellActions(
+      [spell("Bladesharp", { isVariable: true }), spell("Heal")],
+      attributes,
+      grouped,
+    );
+
+    expect(grouped.get("spirit-magic")?.map((a) => [a.name, a.info1?.text])).toEqual([
+      ["Bladesharp", "2+"],
+      ["Heal", "2"],
+    ]);
+    expect(groupInfo.get("spirit-magic")).toEqual({ text: "9/14" });
+  });
+
+  it("gives spirit magic from other sources a subgroup per source", () => {
+    const grouped: GroupedActions = new Map();
+    const { subgroups } = buildSpellActions(
       [
-        spell("Bladesharp", { isVariable: true }),
         spell("Heal", {
           source: "matrix",
           sourceName: "Crystal",
           uuid: undefined,
           matrix: { itemId: "g1", entryIndex: 0 },
         }),
-        spell("Lightning", { type: "runeMagic", cultName: "Orlanth", points: 1 }),
+        spell("Mobility", { source: "allied", sourceName: "Hawk Spirit" }),
+        spell("Protection", { source: "allied", sourceName: "Hawk Spirit" }),
       ],
+      attributes,
       grouped,
     );
 
-    expect(grouped.get("spirit-magic")?.map((a) => [a.name, a.info1?.text])).toEqual([
-      ["Bladesharp", "2+"],
-      ["Heal (Crystal)", "2"],
+    expect(subgroups).toEqual([
+      { id: "spirit-magic-matrix-g1", name: "Crystal", parentId: "spirit-magic" },
+      { id: "spirit-magic-allied-hawk-spirit", name: "Hawk Spirit", parentId: "spirit-magic" },
     ]);
-    expect(grouped.get("spirit-magic")?.[1]?.system).toEqual({
-      actionType: "spiritMagic",
-      actionId: "matrix-g1-0",
+    expect(grouped.get("spirit-magic-matrix-g1")?.[0]).toMatchObject({
+      name: "Heal",
+      system: { actionType: "spiritMagic", actionId: "matrix-g1-0" },
     });
+    expect(grouped.get("spirit-magic-allied-hawk-spirit")?.map((a) => a.name)).toEqual([
+      "Mobility",
+      "Protection",
+    ]);
+    expect(grouped.has("spirit-magic")).toBe(false);
+  });
+
+  it("gives rune magic a subgroup per cult with spells, showing its rune points", () => {
+    const grouped: GroupedActions = new Map();
+    const { subgroups } = buildSpellActions(
+      [
+        spell("Lightning", { type: "runeMagic", cultId: "c1", cultName: "Orlanth", points: 1 }),
+        spell("Teleport", {
+          type: "runeMagic",
+          cultId: "c1",
+          cultName: "Orlanth",
+          source: "allied",
+          sourceName: "Hawk Spirit",
+        }),
+        spell("Odd Spell", { type: "runeMagic" }),
+      ],
+      attributes,
+      grouped,
+    );
+
+    expect(subgroups).toEqual([
+      { id: "rune-magic-cult-c1", name: "Orlanth", parentId: "rune-magic", info1: { text: "3/5" } },
+    ]);
+    expect(grouped.get("rune-magic-cult-c1")?.map((a) => a.name)).toEqual([
+      "Lightning",
+      "Teleport (Hawk Spirit)",
+    ]);
     expect(grouped.get("rune-magic")?.[0]).toMatchObject({
-      name: "Lightning",
-      info2: { text: "Orlanth" },
+      name: "Odd Spell",
       system: { actionType: "runeMagic" },
     });
   });
