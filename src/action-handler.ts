@@ -6,8 +6,11 @@ import {
   buildWeaponActions,
   type GroupedActions,
   type SpellGroups,
+  type SpellPoints,
 } from "./build-actions";
 import { getSetting } from "./settings";
+import type { CharacteristicName } from "./types/rqg-api";
+import type { CharacterSystemData, CultSystemData } from "./types/rqg-schema";
 import type { TahCoreModule } from "./types/tah-core";
 
 export function createActionHandler(coreModule: TahCoreModule) {
@@ -61,12 +64,16 @@ export function createActionHandler(coreModule: TahCoreModule) {
         grouped,
       );
       buildAbilityActions(query.abilities(actorRef), grouped);
-      const attributes = query.attributes(actorRef);
-      const spellGroups = buildSpellActions(query.spells(actorRef), attributes, grouped);
+      const system = actor.system as CharacterSystemData;
+      const spellGroups = buildSpellActions(
+        query.spells(actorRef),
+        spellPoints(actor, system),
+        grouped,
+      );
       this.addSpellGroups(spellGroups);
       buildCharacteristicActions(
-        query.characteristics(actorRef),
-        attributes.reputation,
+        characteristicValues(system),
+        system.background.reputation ?? 0,
         localize,
         grouped,
       );
@@ -82,5 +89,28 @@ export function createActionHandler(coreModule: TahCoreModule) {
       buildCharacteristicActions(undefined, undefined, localize, grouped);
       buildStatusEffectActions(CONFIG.statusEffects, actors, localize, grouped);
     }
+  };
+}
+
+function characteristicValues(
+  system: CharacterSystemData,
+): Record<CharacteristicName, number | null> {
+  const values = {} as Record<CharacteristicName, number | null>;
+  for (const [name, { value }] of Object.entries(system.characteristics)) {
+    values[name as CharacteristicName] = value;
+  }
+  return values;
+}
+
+function spellPoints(actor: Actor, system: CharacterSystemData): SpellPoints {
+  return {
+    magicPoints: system.attributes.magicPoints,
+    runePoints: actor.items.contents
+      .filter((item) => item.type === "cult")
+      .map((cult) => ({
+        cultId: cult.id,
+        cultName: cult.name,
+        ...(cult.system as CultSystemData).runePoints,
+      })),
   };
 }

@@ -49,12 +49,17 @@ declarations:
   `module/handlers/` when using more of it.
 - `rqg-api.d.ts` – mirrors `src/system/api/` in `fvtt-system-rqg`. Keep it in sync when the
   system's API changes. User docs: https://sun-dragon-cult.github.io/rqg-system/api
+- `rqg-schema.d.ts` – the RQG data model fields this module reads, mirroring the data models in
+  `fvtt-system-rqg` (`src/data-model/`). Only declare the fields actually used.
 
 ## Rules
 
-- Only use the RQG public API (`game.system.api`) and Foundry/Core APIs, never `actor.system` or
-  other RQG internals. If the HUD needs something the API lacks, add it to the API in
-  `fvtt-system-rqg` (with tests and docs) rather than reaching into the system.
+- The RQG public API has two parts: the data model schema (`actor.system.*`, `item.system.*`) and
+  `game.system.api`. Read stored values, such as characteristics, magic points or a cult's rune
+  points, straight from the schema. Use `game.system.api` for what needs rules knowledge: rolls,
+  chances, castable spells and the like. Never use other RQG internals (classes, helpers,
+  undocumented flags). If the HUD needs a computed value the API lacks, add it to the API in
+  `fvtt-system-rqg` (with tests and docs) rather than computing it here.
 - Prettier with `printWidth: 100`. Conventional commit messages (`feat:`, `fix:`, `chore:` …).
 - User-facing documentation for RQG belongs on the `sun-dragon-cult.github.io` site, not in this
   repo beyond the README.

@@ -70,18 +70,6 @@ export type CastableSpell = {
   matrix: { itemId: string; entryIndex: number } | undefined;
 };
 
-export type ActorAttributesInfo = {
-  hitPoints: { value: number | null; max: number };
-  magicPoints: { value: number | null; max: number };
-  runePoints: { cultId: string; cultName: string; value: number | null; max: number | null }[];
-  heroPoints: number;
-  reputation: number;
-  dexStrikeRank: number | null;
-  sizStrikeRank: number | null;
-  damageBonus: string;
-  health: string;
-};
-
 export type RollOptions = {
   actor?: ActorRef;
   skipDialog?: boolean;
@@ -98,9 +86,7 @@ export type RqgApi = {
   };
   query: {
     abilities(actor?: ActorRef, options?: { types?: AbilityType[] }): AbilityInfo[];
-    characteristics(actor?: ActorRef): Record<CharacteristicName, number | null>;
     weaponUsages(actor?: ActorRef, options?: { includeUnequipped?: boolean }): WeaponUsageInfo[];
     spells(actor?: ActorRef): CastableSpell[];
-    attributes(actor?: ActorRef): ActorAttributesInfo;
   };
 };

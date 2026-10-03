@@ -7,7 +7,9 @@ declare global {
   interface Actor {
     id: string;
     name: string;
-    items: { get(id: string): Item | undefined };
+    type: string;
+    system: unknown;
+    items: { get(id: string): Item | undefined; contents: Item[] };
     statuses: Set<string>;
     sheet: { render(options: { force: boolean }): unknown } | null;
     toggleStatusEffect(statusId: string, options?: { overlay?: boolean }): Promise<unknown>;
@@ -16,6 +18,8 @@ declare global {
   interface Item {
     id: string;
     name: string;
+    type: string;
+    system: unknown;
     sheet: { render(options: { force: boolean }): unknown } | null;
   }
 

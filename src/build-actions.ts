@@ -7,7 +7,6 @@ import {
 } from "./constants";
 import type {
   AbilityInfo,
-  ActorAttributesInfo,
   CastableSpell,
   CharacteristicName,
   WeaponUsageInfo,
@@ -127,6 +126,12 @@ export type DerivedGroup = {
   info1?: TahInfo;
 };
 
+/** The actor's magic points and each cult's rune points, read from the schema. */
+export type SpellPoints = {
+  magicPoints: { value: number | null; max: number | null };
+  runePoints: { cultId: string; cultName: string; value: number | null; max: number | null }[];
+};
+
 /** Groups and group info the spells need besides the layout's own groups. */
 export type SpellGroups = {
   subgroups: DerivedGroup[];
@@ -144,11 +149,11 @@ function points(value: number | null, max: number | null): TahInfo | undefined {
  */
 export function buildSpellActions(
   spells: CastableSpell[],
-  attributes: Pick<ActorAttributesInfo, "magicPoints" | "runePoints">,
+  spellPoints: SpellPoints,
   grouped: GroupedActions,
 ): SpellGroups {
   const subgroups = new Map<string, DerivedGroup>();
-  for (const cult of attributes.runePoints) {
+  for (const cult of spellPoints.runePoints) {
     subgroups.set(cultGroupId(cult.cultId), {
       id: cultGroupId(cult.cultId),
       name: cult.cultName,
@@ -204,7 +209,7 @@ export function buildSpellActions(
   }
 
   const groupInfo = new Map<string, TahInfo>();
-  const magicPoints = points(attributes.magicPoints.value, attributes.magicPoints.max);
+  const magicPoints = points(spellPoints.magicPoints.value, spellPoints.magicPoints.max);
   if (magicPoints) {
     groupInfo.set(GROUP.spiritMagic.id, magicPoints);
   }
