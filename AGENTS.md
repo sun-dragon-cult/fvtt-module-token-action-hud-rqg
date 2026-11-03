@@ -25,8 +25,9 @@ pnpm (`corepack enable`), Node 24.
   created by factory functions (`createActionHandler`, `createRollHandler`) that extend them.
   `main.ts` then sets `module.api = { requiredCoreModuleVersion, SystemManager }` and calls
   `tokenActionHudSystemReady`.
-- `src/build-actions.ts` holds the pure functions that turn RQG API `query` results into HUD
-  actions grouped by group id. Keep logic here so it stays unit tested.
+- `src/rqg-data.ts` reads the character's items and `src/build-actions.ts` holds the pure functions
+  that turn that data and `actor.getCastableSpells()` into HUD actions grouped by group id. Keep
+  logic in these two so it stays unit tested.
 - `src/action-handler.ts` builds actions on every HUD refresh. `src/roll-handler.ts` handles
   clicks: click = dialog, shift-click = `skipDialog`, right-click = open the item sheet (via
   `system.itemUuid`). With several tokens selected it acts on each controlled token.

@@ -1,6 +1,6 @@
 /**
- * The parts of the RQG system's public API (`game.system.api`) used by this module.
- * Mirrors src/system/api in fvtt-system-rqg, documented at
+ * The parts of the RQG system's public API (`game.system.api`) used by this module, plus the shapes
+ * this module builds from the character data. Mirrors src/system/api in fvtt-system-rqg, documented at
  * https://sun-dragon-cult.github.io/rqg-system/api
  */
 
@@ -83,10 +83,5 @@ export type RqgApi = {
     attack(weapon: string, options?: { actor?: ActorRef; usage?: UsageType }): Promise<void>;
     spiritMagic(spell: string | CastableSpell, options?: RollOptions): Promise<unknown>;
     runeMagic(spell: string | CastableSpell, options?: RollOptions): Promise<unknown>;
-  };
-  query: {
-    abilities(actor?: ActorRef, options?: { types?: AbilityType[] }): AbilityInfo[];
-    weaponUsages(actor?: ActorRef, options?: { includeUnequipped?: boolean }): WeaponUsageInfo[];
-    spells(actor?: ActorRef): CastableSpell[];
   };
 };

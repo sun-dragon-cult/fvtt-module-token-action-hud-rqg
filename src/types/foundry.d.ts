@@ -17,9 +17,13 @@ declare global {
 
   interface Item {
     id: string;
+    uuid: string;
     name: string;
+    img: string | null;
+    sort: number;
     type: string;
     system: unknown;
+    getFlag(scope: string, key: string): unknown;
     sheet: { render(options: { force: boolean }): unknown } | null;
   }
 

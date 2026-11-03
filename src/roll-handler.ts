@@ -1,6 +1,7 @@
 import { spellKey } from "./build-actions";
 import { ACTION_TYPE, type RqgActionSystemData } from "./constants";
 import type { CharacteristicName, UsageType } from "./types/rqg-api";
+import type { RqgActor } from "./types/rqg-schema";
 import type { TahCoreModule } from "./types/tah-core";
 
 export function createRollHandler(coreModule: TahCoreModule) {
@@ -37,7 +38,7 @@ export function createRollHandler(coreModule: TahCoreModule) {
         return;
       }
 
-      const { rolls, query } = game.system.api;
+      const { rolls } = game.system.api;
       const actorRef = token?.document ?? actor;
       const skipDialog = this.isShift;
 
@@ -63,7 +64,9 @@ export function createRollHandler(coreModule: TahCoreModule) {
         case ACTION_TYPE.spiritMagic:
         case ACTION_TYPE.runeMagic: {
           // Look the spell up again, its source (an allied spirit or a matrix) may have changed
-          const spell = query.spells(actorRef).find((s) => spellKey(s) === data.actionId);
+          const spell = (actor as RqgActor)
+            .getCastableSpells()
+            .find((s) => spellKey(s) === data.actionId);
           if (!spell) {
             return;
           }
