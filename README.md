@@ -42,7 +42,9 @@ To load it in Foundry, symlink `dist/` into your Foundry data folder as
 The module's code is in `src/`:
 
 - `main.ts` registers with Token Action HUD Core when Core hands over its API.
-- `build-actions.ts` turns the RQG API's `query` results into HUD actions (unit tested).
+- `rqg-data.ts` reads skills, runes, passions and weapon usages from the character's items, and
+  `build-actions.ts` turns them, the castable spells and the characteristics into HUD actions (both
+  unit tested).
 - `action-handler.ts` and `roll-handler.ts` extend Core's base classes: building the actions, and
   calling the RQG API's `rolls` when an action is clicked.
 - `defaults.ts` is the default HUD layout.

@@ -8,9 +8,10 @@ import {
   type SpellGroups,
   type SpellPoints,
 } from "./build-actions";
+import { abilityInfos, weaponUsageInfos } from "./rqg-data";
 import { getSetting } from "./settings";
 import type { CharacteristicName } from "./types/rqg-api";
-import type { CharacterSystemData, CultSystemData } from "./types/rqg-schema";
+import type { CharacterSystemData, CultSystemData, RqgActor } from "./types/rqg-schema";
 import type { TahCoreModule } from "./types/tah-core";
 
 export function createActionHandler(coreModule: TahCoreModule) {
@@ -53,20 +54,15 @@ export function createActionHandler(coreModule: TahCoreModule) {
     }
 
     private buildSingleActorActions(actor: Actor, grouped: GroupedActions): void {
-      const { query } = game.system.api;
-      const actorRef = this.token?.document ?? actor;
-
       buildWeaponActions(
-        query.weaponUsages(actorRef, {
-          includeUnequipped: getSetting("showUnequippedWeapons"),
-        }),
+        weaponUsageInfos(actor, { includeUnequipped: getSetting("showUnequippedWeapons") }),
         localize,
         grouped,
       );
-      buildAbilityActions(query.abilities(actorRef), grouped);
+      buildAbilityActions(abilityInfos(actor), grouped);
       const system = actor.system as CharacterSystemData;
       const spellGroups = buildSpellActions(
-        query.spells(actorRef),
+        (actor as RqgActor).getCastableSpells(),
         spellPoints(actor, system),
         grouped,
       );
