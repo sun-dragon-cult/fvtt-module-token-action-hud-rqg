@@ -23,6 +23,7 @@ declare global {
     sort: number;
     type: string;
     system: unknown;
+    parent: Actor | null;
     getFlag(scope: string, key: string): unknown;
     sheet: { render(options: { force: boolean }): unknown } | null;
   }
@@ -59,6 +60,7 @@ declare global {
   const CONFIG: { statusEffects: StatusEffectConfig[] };
 
   function fromUuid(uuid: string): Promise<unknown>;
+  function fromUuidSync(uuid: string): unknown;
 
   const Hooks: {
     on(hook: string, fn: (...args: never[]) => unknown): number;

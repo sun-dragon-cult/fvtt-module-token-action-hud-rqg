@@ -126,10 +126,14 @@ export type DerivedGroup = {
   info1?: TahInfo;
 };
 
+type MagicPoints = { value: number | null; max: number | null };
+
 /** The actor's magic points and each cult's rune points, read from the schema. */
 export type SpellPoints = {
-  magicPoints: { value: number | null; max: number | null };
+  magicPoints: MagicPoints;
   runePoints: { cultId: string; cultName: string; value: number | null; max: number | null }[];
+  /** Magic points of the Allied Spirit or bound spirit that owns a spell, by spell uuid. */
+  spiritMagicPoints: Map<string, MagicPoints>;
 };
 
 /** Groups and group info the spells need besides the layout's own groups. */
@@ -145,7 +149,8 @@ function points(value: number | null, max: number | null): TahInfo | undefined {
 /**
  * Rune magic gets a subgroup per cult, showing the cult's rune points. Spirit magic from the
  * actor itself goes straight in the spirit magic group, which shows the magic points. Spells from
- * an Allied Spirit, bound spirit or matrix get a subgroup per source.
+ * an Allied Spirit, bound spirit or matrix get a subgroup per source; a spirit's subgroup shows
+ * the spirit's own magic points.
  */
 export function buildSpellActions(
   spells: CastableSpell[],
@@ -184,10 +189,12 @@ export function buildSpellActions(
     } else if (spell.source !== "own") {
       groupId = spiritSourceGroupId(spell);
       if (!subgroups.has(groupId)) {
+        const sourcePoints = spell.uuid ? spellPoints.spiritMagicPoints.get(spell.uuid) : undefined;
         subgroups.set(groupId, {
           id: groupId,
           name: spell.sourceName ?? spell.source,
           parentId: GROUP.spiritMagic.id,
+          info1: sourcePoints ? points(sourcePoints.value, sourcePoints.max) : undefined,
         });
       }
     }

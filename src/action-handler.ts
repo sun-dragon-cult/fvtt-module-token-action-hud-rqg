@@ -10,7 +10,7 @@ import {
 } from "./build-actions";
 import { abilityInfos, weaponUsageInfos } from "./rqg-data";
 import { getSetting } from "./settings";
-import type { CharacteristicName } from "./types/rqg-api";
+import type { CastableSpell, CharacteristicName } from "./types/rqg-api";
 import type { CharacterSystemData, CultSystemData, RqgActor } from "./types/rqg-schema";
 import type { TahCoreModule } from "./types/tah-core";
 
@@ -61,11 +61,8 @@ export function createActionHandler(coreModule: TahCoreModule) {
       );
       buildAbilityActions(abilityInfos(actor), grouped);
       const system = actor.system as CharacterSystemData;
-      const spellGroups = buildSpellActions(
-        (actor as RqgActor).getCastableSpells(),
-        spellPoints(actor, system),
-        grouped,
-      );
+      const spells = (actor as RqgActor).getCastableSpells();
+      const spellGroups = buildSpellActions(spells, spellPoints(actor, system, spells), grouped);
       this.addSpellGroups(spellGroups);
       buildCharacteristicActions(
         characteristicValues(system),
@@ -98,8 +95,25 @@ function characteristicValues(
   return values;
 }
 
-function spellPoints(actor: Actor, system: CharacterSystemData): SpellPoints {
+function spellPoints(
+  actor: Actor,
+  system: CharacterSystemData,
+  spells: CastableSpell[],
+): SpellPoints {
+  const spiritMagicPoints = new Map<string, SpellPoints["magicPoints"]>();
+  for (const spell of spells) {
+    if ((spell.source === "allied" || spell.source === "boundSpirit") && spell.uuid) {
+      const owner = (fromUuidSync(spell.uuid) as Item | null)?.parent;
+      if (owner) {
+        spiritMagicPoints.set(
+          spell.uuid,
+          (owner.system as CharacterSystemData).attributes.magicPoints,
+        );
+      }
+    }
+  }
   return {
+    spiritMagicPoints,
     magicPoints: system.attributes.magicPoints,
     runePoints: actor.items.contents
       .filter((item) => item.type === "cult")

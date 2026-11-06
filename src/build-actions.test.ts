@@ -127,6 +127,7 @@ describe("buildSpellActions", () => {
       { cultId: "c1", cultName: "Orlanth", value: 3, max: 5 },
       { cultId: "c2", cultName: "Ernalda", value: 1, max: 1 },
     ],
+    spiritMagicPoints: new Map([["Actor.a.Item.Mobility", { value: 4, max: 11 }]]),
   };
 
   it("puts the actor's own spirit magic in the spirit magic group, with magic points", () => {
@@ -163,7 +164,12 @@ describe("buildSpellActions", () => {
 
     expect(subgroups).toEqual([
       { id: "spirit-magic-matrix-g1", name: "Crystal", parentId: "spirit-magic" },
-      { id: "spirit-magic-allied-hawk-spirit", name: "Hawk Spirit", parentId: "spirit-magic" },
+      {
+        id: "spirit-magic-allied-hawk-spirit",
+        name: "Hawk Spirit",
+        parentId: "spirit-magic",
+        info1: { text: "4/11" },
+      },
     ]);
     expect(grouped.get("spirit-magic-matrix-g1")?.[0]).toMatchObject({
       name: "Heal",
