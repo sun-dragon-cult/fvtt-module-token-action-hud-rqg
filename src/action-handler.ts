@@ -24,7 +24,7 @@ export function createActionHandler(coreModule: TahCoreModule) {
       this.derivedGroupIds.clear();
 
       if (this.actor) {
-        this.buildSingleActorActions(this.actor, grouped);
+        await this.buildSingleActorActions(this.actor, grouped);
       } else {
         this.buildMultipleActorActions(grouped);
       }
@@ -53,7 +53,7 @@ export function createActionHandler(coreModule: TahCoreModule) {
       }
     }
 
-    private buildSingleActorActions(actor: Actor, grouped: GroupedActions): void {
+    private async buildSingleActorActions(actor: Actor, grouped: GroupedActions): Promise<void> {
       buildWeaponActions(
         weaponUsageInfos(actor, { includeUnequipped: getSetting("showUnequippedWeapons") }),
         localize,
@@ -61,9 +61,10 @@ export function createActionHandler(coreModule: TahCoreModule) {
       );
       buildAbilityActions(abilityInfos(actor), grouped);
       const system = actor.system as CharacterSystemData;
+      const spells = await (actor as RqgActor).getCastableSpells();
       const spellGroups = buildSpellActions(
-        (actor as RqgActor).getCastableSpells(),
-        spellPoints(actor, system),
+        spells,
+        spellPoints(actor as RqgActor, system),
         grouped,
       );
       this.addSpellGroups(spellGroups);
@@ -98,8 +99,18 @@ function characteristicValues(
   return values;
 }
 
-function spellPoints(actor: Actor, system: CharacterSystemData): SpellPoints {
+function spellPoints(actor: RqgActor, system: CharacterSystemData): SpellPoints {
+  // Keyed like the sourceId of the spirit's spells: a bound spirit's source id, the ally's uuid
+  const spiritMagicPoints = new Map<string, SpellPoints["magicPoints"]>();
+  for (const source of actor.getMagicPointSources()) {
+    if (source.type === "boundSpirit") {
+      spiritMagicPoints.set(source.id, source.magicPoints);
+    } else if (source.type === "ally") {
+      spiritMagicPoints.set(source.uuid, source.magicPoints);
+    }
+  }
   return {
+    spiritMagicPoints,
     magicPoints: system.attributes.magicPoints,
     runePoints: actor.items.contents
       .filter((item) => item.type === "cult")

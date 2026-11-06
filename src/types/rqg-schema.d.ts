@@ -3,7 +3,13 @@
  * (src/data-model/), which are part of the system's public API. Only fields used here are declared.
  */
 
-import type { CastableSpell, CharacteristicName, SkillCategory, UsageType } from "./rqg-api";
+import type {
+  CastableSpell,
+  CharacteristicName,
+  MagicPointSource,
+  SkillCategory,
+  UsageType,
+} from "./rqg-api";
 
 export type RqgResource = { value: number | null; max: number | null };
 
@@ -34,4 +40,7 @@ export type WeaponSystemData = {
 };
 
 /** An RQG character, with the methods this module calls. */
-export type RqgActor = Actor & { getCastableSpells(): CastableSpell[] };
+export type RqgActor = Actor & {
+  getCastableSpells(): Promise<CastableSpell[]>;
+  getMagicPointSources(): MagicPointSource[];
+};

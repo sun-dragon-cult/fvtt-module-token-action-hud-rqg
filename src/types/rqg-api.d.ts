@@ -66,8 +66,22 @@ export type CastableSpell = {
   cultName: string | undefined;
   source: SpellSource;
   sourceName: string | undefined;
+  /** The same for every spell from one source */
+  sourceId: string;
+  rqid: string | undefined;
+  /** Uuid of the actor whose list this is */
+  casterUuid: string;
   uuid: string | undefined;
   matrix: { itemId: string; entryIndex: number } | undefined;
+};
+
+/** From `actor.getMagicPointSources()` */
+export type MagicPointSource = {
+  id: string;
+  type: "self" | "item" | "ally" | "boundSpirit";
+  name: string;
+  magicPoints: { value: number; max: number };
+  uuid: string;
 };
 
 export type RollOptions = {

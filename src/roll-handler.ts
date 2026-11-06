@@ -64,9 +64,9 @@ export function createRollHandler(coreModule: TahCoreModule) {
         case ACTION_TYPE.spiritMagic:
         case ACTION_TYPE.runeMagic: {
           // Look the spell up again, its source (an allied spirit or a matrix) may have changed
-          const spell = (actor as RqgActor)
-            .getCastableSpells()
-            .find((s) => spellKey(s) === data.actionId);
+          const spell = (await (actor as RqgActor).getCastableSpells()).find(
+            (s) => spellKey(s) === data.actionId,
+          );
           if (!spell) {
             return;
           }
