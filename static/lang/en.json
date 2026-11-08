@@ -1,7 +1,10 @@
 {
   "tokenActionHud": {
     "rqg": {
+      "addWound": "Add Wound",
       "characteristics": "Characteristics",
+      "combatSkills": "Combat Skills",
+      "healWounds": "Heal Wounds",
       "magic": "Magic",
       "passions": "Passions",
       "passionsAndRunes": "Passions & Runes",

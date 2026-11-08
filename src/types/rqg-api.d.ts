@@ -89,7 +89,19 @@ export type RollOptions = {
   skipDialog?: boolean;
 };
 
+/** A hit location with its hit points, top of the body first. */
+export type HitLocationInfo = {
+  id: string;
+  name: string;
+  img: string | null;
+  hitPoints: { value: number | null; max: number | null };
+};
+
 export type RqgApi = {
+  dialogs: {
+    addWound(hitLocation: string, options?: { actor?: ActorRef }): Promise<void>;
+    healWounds(hitLocation?: string, options?: { actor?: ActorRef }): Promise<void>;
+  };
   rolls: {
     ability(item: string, options?: RollOptions): Promise<unknown>;
     characteristic(name: CharacteristicName, options?: RollOptions): Promise<unknown>;
