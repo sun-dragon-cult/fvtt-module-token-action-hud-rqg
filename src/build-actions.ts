@@ -126,10 +126,14 @@ export type DerivedGroup = {
   info1?: TahInfo;
 };
 
+type MagicPoints = { value: number | null; max: number | null };
+
 /** The actor's magic points and each cult's rune points, read from the schema. */
 export type SpellPoints = {
-  magicPoints: { value: number | null; max: number | null };
+  magicPoints: MagicPoints;
   runePoints: { cultId: string; cultName: string; value: number | null; max: number | null }[];
+  /** Magic points of an Allied Spirit or bound spirit, by the sourceId of its spells. */
+  spiritMagicPoints: Map<string, MagicPoints>;
 };
 
 /** Groups and group info the spells need besides the layout's own groups. */
@@ -145,7 +149,8 @@ function points(value: number | null, max: number | null): TahInfo | undefined {
 /**
  * Rune magic gets a subgroup per cult, showing the cult's rune points. Spirit magic from the
  * actor itself goes straight in the spirit magic group, which shows the magic points. Spells from
- * an Allied Spirit, bound spirit or matrix get a subgroup per source.
+ * an Allied Spirit, bound spirit or matrix get a subgroup per source; a spirit's subgroup shows
+ * the spirit's own magic points.
  */
 export function buildSpellActions(
   spells: CastableSpell[],
@@ -184,10 +189,12 @@ export function buildSpellActions(
     } else if (spell.source !== "own") {
       groupId = spiritSourceGroupId(spell);
       if (!subgroups.has(groupId)) {
+        const sourcePoints = spellPoints.spiritMagicPoints.get(spell.sourceId);
         subgroups.set(groupId, {
           id: groupId,
           name: spell.sourceName ?? spell.source,
           parentId: GROUP.spiritMagic.id,
+          info1: sourcePoints ? points(sourcePoints.value, sourcePoints.max) : undefined,
         });
       }
     }
@@ -225,10 +232,9 @@ function cultGroupId(cultId: string): string {
   return `rune-magic-cult-${cultId}`;
 }
 
-/** Matrices are told apart by item id, spirits only by name since they have no id in the API. */
+/** A matrix's sourceId is the item uuid, which is long on an unlinked token. */
 function spiritSourceGroupId(spell: CastableSpell): string {
-  const key =
-    spell.matrix?.itemId ?? (spell.sourceName ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-");
+  const key = spell.matrix?.itemId ?? spell.sourceId.replace(/[^A-Za-z0-9]+/g, "-");
   return `spirit-magic-${spell.source}-${key}`;
 }
 

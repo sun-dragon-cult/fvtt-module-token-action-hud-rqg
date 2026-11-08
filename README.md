@@ -9,7 +9,8 @@ Select a token and the HUD shows its:
   rank
 - **Skills** – one group per skill category
 - **Magic** – spirit and rune magic, including spells from an Allied Spirit, bound spirits and
-  spell matrices
+  spell matrices. Each Allied Spirit and bound spirit gets its own group showing the spirit's magic
+  points, each cult one showing its rune points.
 - **Passions & Runes**
 - **Characteristics** – characteristic rolls and Reputation
 - **Status Effects** – toggle status effects on the token
