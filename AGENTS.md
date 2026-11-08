@@ -75,9 +75,9 @@ after changes.
 ## Status and open items
 
 - The first version works in Foundry v14 with Token Action HUD Core 2.1.2.
-- Waiting on the system's public API work (epic sun-dragon-cult/fvtt-system-rqg#1133):
-  - #1137: a hook when an actor's spell or point sources change. Until then the HUD doesn't refresh
-    when an Allied Spirit, bound spirit or matrix on another actor changes.
+- `src/dependencies.ts` refreshes the HUD (Core's `forceUpdateTokenActionHud` hook) when an Allied
+  Spirit bond partner or bound spirit of the HUD's actor changes. Gap: when a priest links an ally
+  only the priest changes, so the ally's HUD shows the bond after its next rebuild.
 - Release order: RQG 6.2.0 first, then a GitHub release of this module, then register it as a
   Foundry package.
 - GitHub: https://github.com/sun-dragon-cult/fvtt-module-token-action-hud-rqg (MIT).
