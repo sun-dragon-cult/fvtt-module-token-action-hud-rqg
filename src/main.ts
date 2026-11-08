@@ -1,9 +1,12 @@
 import { createActionHandler } from "./action-handler";
 import { MODULE_ID, REQUIRED_CORE_MODULE_VERSION } from "./constants";
 import { getDefaults } from "./defaults";
+import { registerDependencyHooks } from "./dependencies";
 import { createRollHandler } from "./roll-handler";
 import { registerSettings } from "./settings";
 import type { TahCoreModule } from "./types/tah-core";
+
+registerDependencyHooks();
 
 // Core hands over its API in this hook. The system module answers with its SystemManager,
 // which Core then uses to create the action and roll handlers.

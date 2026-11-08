@@ -6,6 +6,7 @@
 declare global {
   interface Actor {
     id: string;
+    uuid: string;
     name: string;
     type: string;
     system: unknown;

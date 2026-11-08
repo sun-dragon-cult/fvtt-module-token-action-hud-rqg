@@ -10,9 +10,10 @@ import {
   type SpellGroups,
   type SpellPoints,
 } from "./build-actions";
+import { dependencyActorUuids, setDependencies } from "./dependencies";
 import { abilityInfos, hitLocationInfos, weaponUsageInfos } from "./rqg-data";
 import { getSetting } from "./settings";
-import type { CharacteristicName } from "./types/rqg-api";
+import type { CharacteristicName, MagicPointSource } from "./types/rqg-api";
 import type { CharacterSystemData, CultSystemData, RqgActor } from "./types/rqg-schema";
 import type { TahCoreModule } from "./types/tah-core";
 
@@ -28,6 +29,7 @@ export function createActionHandler(coreModule: TahCoreModule) {
       if (this.actor) {
         await this.buildSingleActorActions(this.actor, grouped);
       } else {
+        setDependencies(new Set());
         this.buildMultipleActorActions(grouped);
       }
 
@@ -66,9 +68,11 @@ export function createActionHandler(coreModule: TahCoreModule) {
       const system = actor.system as CharacterSystemData;
       buildSpiritCombatDamageAction(system.attributes.spiritCombatDamage, localize, grouped);
       const spells = await (actor as RqgActor).getCastableSpells();
+      const magicPointSources = (actor as RqgActor).getMagicPointSources();
+      setDependencies(dependencyActorUuids(actor.uuid, spells, magicPointSources));
       const spellGroups = buildSpellActions(
         spells,
-        spellPoints(actor as RqgActor, system),
+        spellPoints(actor as RqgActor, system, magicPointSources),
         grouped,
       );
       this.addSpellGroups(spellGroups);
@@ -103,10 +107,14 @@ function characteristicValues(
   return values;
 }
 
-function spellPoints(actor: RqgActor, system: CharacterSystemData): SpellPoints {
+function spellPoints(
+  actor: RqgActor,
+  system: CharacterSystemData,
+  magicPointSources: MagicPointSource[],
+): SpellPoints {
   // Keyed like the sourceId of the spirit's spells: a bound spirit's source id, the ally's uuid
   const spiritMagicPoints = new Map<string, SpellPoints["magicPoints"]>();
-  for (const source of actor.getMagicPointSources()) {
+  for (const source of magicPointSources) {
     if (source.type === "boundSpirit") {
       spiritMagicPoints.set(source.id, source.magicPoints);
     } else if (source.type === "ally") {
