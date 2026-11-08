@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   buildAbilityActions,
   buildCharacteristicActions,
+  buildHitLocationActions,
   buildSpellActions,
+  buildSpiritCombatDamageAction,
   buildStatusEffectActions,
   buildWeaponActions,
   type GroupedActions,
@@ -88,6 +90,22 @@ describe("buildAbilityActions", () => {
       info1: { text: "45%" },
       system: { actionType: "ability", actionId: "Scan-id", itemUuid: "Actor.a.Item.Scan-id" },
     });
+  });
+
+  it("also puts Dodge and Spirit Combat under Combat", () => {
+    const grouped: GroupedActions = new Map();
+    buildAbilityActions(
+      [
+        ability("Dodge", "skill", { category: "agility", rqid: "i.skill.dodge" }),
+        ability("Jump", "skill", { category: "agility", rqid: "i.skill.jump" }),
+        ability("Spirit Combat", "skill", { category: "magic", rqid: "i.skill.spirit-combat" }),
+      ],
+      grouped,
+    );
+
+    expect(grouped.get("combat-skills")?.map((a) => a.name)).toEqual(["Dodge"]);
+    expect(grouped.get("spirit-combat")?.map((a) => a.name)).toEqual(["Spirit Combat"]);
+    expect(grouped.get("skills-agility")?.map((a) => a.name)).toEqual(["Dodge", "Jump"]);
   });
 });
 
@@ -313,6 +331,47 @@ describe("buildStatusEffectActions", () => {
     expect(grouped.get("status-effects")?.map((a) => a.cssClass)).toEqual([
       "toggle active",
       "toggle",
+    ]);
+  });
+});
+
+describe("buildSpiritCombatDamageAction", () => {
+  it("shows the damage formula, unless the actor deals none", () => {
+    const grouped: GroupedActions = new Map();
+    buildSpiritCombatDamageAction("1D6+1", localize, grouped);
+    buildSpiritCombatDamageAction("0", localize, grouped);
+
+    expect(grouped.get("spirit-combat")?.map((a) => [a.name, a.info1?.text])).toEqual([
+      ["[RQG.Actor.Combat.SpiritCombatDamage]", "1D6+1"],
+    ]);
+  });
+});
+
+describe("buildHitLocationActions", () => {
+  it("lists every hit location to add a wound, and the wounded ones to heal", () => {
+    const grouped: GroupedActions = new Map();
+    buildHitLocationActions(
+      [
+        { id: "h", name: "Head", img: null, hitPoints: { value: 2, max: 5 } },
+        { id: "c", name: "Chest", img: null, hitPoints: { value: 6, max: 6 } },
+        { id: "a", name: "Right Arm", img: null, hitPoints: { value: -4, max: 4 } },
+        { id: "l", name: "Left Leg", img: null, hitPoints: { value: null, max: 5 } },
+      ],
+      grouped,
+    );
+
+    expect(grouped.get("add-wound")?.map((a) => [a.name, a.info1?.text])).toEqual([
+      ["Head", "2/5"],
+      ["Chest", "6/6"],
+      ["Right Arm", "-4/4"],
+      ["Left Leg", undefined],
+    ]);
+    expect(grouped.get("add-wound")?.[0]).toMatchObject({
+      system: { actionType: "addWound", actionId: "h" },
+    });
+    expect(grouped.get("heal-wounds")?.map((a) => [a.name, a.system.actionType])).toEqual([
+      ["Head", "healWound"],
+      ["Right Arm", "healWound"],
     ]);
   });
 });

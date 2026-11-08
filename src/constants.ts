@@ -28,6 +28,9 @@ export const ACTION_TYPE = {
   spiritMagic: "spiritMagic",
   runeMagic: "runeMagic",
   statusEffect: "statusEffect",
+  spiritCombatDamage: "spiritCombatDamage",
+  addWound: "addWound",
+  healWound: "healWound",
 } as const;
 
 export type ActionType = (typeof ACTION_TYPE)[keyof typeof ACTION_TYPE];
@@ -44,6 +47,10 @@ export type RqgActionSystemData = {
 /** Group ids and the translation keys of their names */
 export const GROUP = {
   weapons: { id: "weapons", name: "tokenActionHud.rqg.weapons" },
+  combatSkills: { id: "combat-skills", name: "tokenActionHud.rqg.combatSkills" },
+  spiritCombat: { id: "spirit-combat", name: "RQG.Actor.Combat.SpiritCombat" },
+  addWound: { id: "add-wound", name: "tokenActionHud.rqg.addWound" },
+  healWounds: { id: "heal-wounds", name: "tokenActionHud.rqg.healWounds" },
   spiritMagic: { id: "spirit-magic", name: "RQG.Item.SheetTab.SpiritMagic" },
   runeMagic: { id: "rune-magic", name: "RQG.Item.SheetTab.RuneMagic" },
   passions: { id: "passions", name: "tokenActionHud.rqg.passions" },

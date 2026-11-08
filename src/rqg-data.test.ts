@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { abilityInfos, weaponUsageInfos } from "./rqg-data";
+import { abilityInfos, hitLocationInfos, weaponUsageInfos } from "./rqg-data";
 
 function item(overrides: Record<string, unknown>) {
   return {
@@ -40,7 +40,7 @@ describe("abilityInfos", () => {
 
 describe("weaponUsageInfos", () => {
   const usage = (rqid?: string) => ({ skillRqidLink: rqid ? { rqid } : undefined, strikeRank: 7 });
-  const weapon = (id: string, equippedStatus: string, sort = 0) =>
+  const weapon = (id: string, equippedStatus: string, sort = 0, isNatural = false) =>
     item({
       id,
       name: id,
@@ -48,6 +48,7 @@ describe("weaponUsageInfos", () => {
       sort,
       system: {
         equippedStatus,
+        isNatural,
         usage: {
           oneHand: usage("i.skill.spear"),
           offHand: usage(),
@@ -79,11 +80,39 @@ describe("weaponUsageInfos", () => {
     });
   });
 
+  it("lists natural weapons whatever their equipped status", () => {
+    const actor = actorWith(weapon("Fist", "notCarried", 0, true), weapon("Axe", "carried"));
+
+    const result = weaponUsageInfos(actor, { includeUnequipped: false });
+
+    expect(result.map((u) => u.name)).toEqual(["Fist", "Fist"]);
+  });
+
   it("includes carried weapons on request, in sheet order", () => {
     const actor = actorWith(weapon("Spear", "equipped", 2), weapon("Axe", "carried", 1));
 
     const result = weaponUsageInfos(actor, { includeUnequipped: true });
 
     expect(result.map((u) => u.name)).toEqual(["Axe", "Axe", "Spear", "Spear"]);
+  });
+});
+
+describe("hitLocationInfos", () => {
+  const location = (id: string, dieFrom: number) =>
+    item({
+      id,
+      name: id,
+      type: "hitLocation",
+      system: { dieFrom, hitPoints: { value: 3, max: 5 } },
+    });
+
+  it("lists hit locations from the head down", () => {
+    const actor = actorWith(location("Left Leg", 1), location("Head", 19), location("Chest", 12));
+
+    expect(hitLocationInfos(actor).map((l) => [l.name, l.hitPoints.value])).toEqual([
+      ["Head", 3],
+      ["Chest", 3],
+      ["Left Leg", 3],
+    ]);
   });
 });

@@ -1,7 +1,7 @@
 import { spellKey } from "./build-actions";
 import { ACTION_TYPE, type RqgActionSystemData } from "./constants";
 import type { CharacteristicName, UsageType } from "./types/rqg-api";
-import type { RqgActor } from "./types/rqg-schema";
+import type { CharacterSystemData, RqgActor } from "./types/rqg-schema";
 import type { TahCoreModule } from "./types/tah-core";
 
 export function createRollHandler(coreModule: TahCoreModule) {
@@ -38,7 +38,7 @@ export function createRollHandler(coreModule: TahCoreModule) {
         return;
       }
 
-      const { rolls } = game.system.api;
+      const { rolls, dialogs } = game.system.api;
       const actorRef = token?.document ?? actor;
       const skipDialog = this.isShift;
 
@@ -75,6 +75,23 @@ export function createRollHandler(coreModule: TahCoreModule) {
           await cast(spell, { actor: actorRef, skipDialog });
           break;
         }
+        case ACTION_TYPE.spiritCombatDamage: {
+          const formula = (actor.system as CharacterSystemData).attributes.spiritCombatDamage;
+          if (formula) {
+            const roll = await new Roll(formula).evaluate();
+            await roll.toMessage({
+              speaker: ChatMessage.getSpeaker({ actor, token: token?.document }),
+              flavor: game.i18n.localize("RQG.Actor.Combat.SpiritCombatDamage"),
+            });
+          }
+          break;
+        }
+        case ACTION_TYPE.addWound:
+          await dialogs.addWound(data.actionId, { actor: actorRef });
+          break;
+        case ACTION_TYPE.healWound:
+          await dialogs.healWounds(data.actionId, { actor: actorRef });
+          break;
         case ACTION_TYPE.statusEffect:
           await actor.toggleStatusEffect(data.actionId, { overlay: this.isRightClick });
           Hooks.callAll("forceUpdateTokenActionHud");
