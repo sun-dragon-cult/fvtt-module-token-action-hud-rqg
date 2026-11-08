@@ -40,7 +40,7 @@ describe("abilityInfos", () => {
 
 describe("weaponUsageInfos", () => {
   const usage = (rqid?: string) => ({ skillRqidLink: rqid ? { rqid } : undefined, strikeRank: 7 });
-  const weapon = (id: string, equippedStatus: string, sort = 0) =>
+  const weapon = (id: string, equippedStatus: string, sort = 0, isNatural = false) =>
     item({
       id,
       name: id,
@@ -48,6 +48,7 @@ describe("weaponUsageInfos", () => {
       sort,
       system: {
         equippedStatus,
+        isNatural,
         usage: {
           oneHand: usage("i.skill.spear"),
           offHand: usage(),
@@ -77,6 +78,14 @@ describe("weaponUsageInfos", () => {
       strikeRank: 7,
       unusable: false,
     });
+  });
+
+  it("lists natural weapons whatever their equipped status", () => {
+    const actor = actorWith(weapon("Fist", "notCarried", 0, true), weapon("Axe", "carried"));
+
+    const result = weaponUsageInfos(actor, { includeUnequipped: false });
+
+    expect(result.map((u) => u.name)).toEqual(["Fist", "Fist"]);
   });
 
   it("includes carried weapons on request, in sheet order", () => {

@@ -60,6 +60,16 @@ declare global {
 
   function fromUuid(uuid: string): Promise<unknown>;
 
+  class Roll {
+    constructor(formula: string);
+    evaluate(): Promise<Roll>;
+    toMessage(messageData?: Record<string, unknown>): Promise<unknown>;
+  }
+
+  const ChatMessage: {
+    getSpeaker(options: { actor?: Actor; token?: TokenDocument }): unknown;
+  };
+
   const Hooks: {
     on(hook: string, fn: (...args: never[]) => unknown): number;
     once(hook: string, fn: (...args: never[]) => unknown): number;

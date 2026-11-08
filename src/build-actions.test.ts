@@ -3,6 +3,7 @@ import {
   buildAbilityActions,
   buildCharacteristicActions,
   buildSpellActions,
+  buildSpiritCombatDamageAction,
   buildStatusEffectActions,
   buildWeaponActions,
   type GroupedActions,
@@ -85,6 +86,22 @@ describe("buildAbilityActions", () => {
       info1: { text: "45%" },
       system: { actionType: "ability", actionId: "Scan-id", itemUuid: "Actor.a.Item.Scan-id" },
     });
+  });
+
+  it("also puts Dodge and Spirit Combat under Combat", () => {
+    const grouped: GroupedActions = new Map();
+    buildAbilityActions(
+      [
+        ability("Dodge", "skill", { category: "agility", rqid: "i.skill.dodge" }),
+        ability("Jump", "skill", { category: "agility", rqid: "i.skill.jump" }),
+        ability("Spirit Combat", "skill", { category: "magic", rqid: "i.skill.spirit-combat" }),
+      ],
+      grouped,
+    );
+
+    expect(grouped.get("combat-skills")?.map((a) => a.name)).toEqual(["Dodge"]);
+    expect(grouped.get("spirit-combat")?.map((a) => a.name)).toEqual(["Spirit Combat"]);
+    expect(grouped.get("skills-agility")?.map((a) => a.name)).toEqual(["Dodge", "Jump"]);
   });
 });
 
@@ -267,6 +284,18 @@ describe("buildStatusEffectActions", () => {
     expect(grouped.get("status-effects")?.map((a) => a.cssClass)).toEqual([
       "toggle active",
       "toggle",
+    ]);
+  });
+});
+
+describe("buildSpiritCombatDamageAction", () => {
+  it("shows the damage formula, unless the actor deals none", () => {
+    const grouped: GroupedActions = new Map();
+    buildSpiritCombatDamageAction("1D6+1", localize, grouped);
+    buildSpiritCombatDamageAction("0", localize, grouped);
+
+    expect(grouped.get("spirit-combat")?.map((a) => [a.name, a.info1?.text])).toEqual([
+      ["[RQG.Actor.Combat.SpiritCombatDamage]", "1D6+1"],
     ]);
   });
 });

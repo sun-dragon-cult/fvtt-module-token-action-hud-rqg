@@ -51,26 +51,39 @@ function addTo(grouped: GroupedActions, groupId: string, actionData: TahActionDa
   grouped.set(groupId, actions);
 }
 
-/** Skills go in a group per skill category, passions and runes in their own groups. */
+/** Skills also listed under Combat, by rqid */
+const COMBAT_GROUP_BY_RQID: Record<string, string> = {
+  "i.skill.dodge": GROUP.combatSkills.id,
+  "i.skill.spirit-combat": GROUP.spiritCombat.id,
+};
+
+/**
+ * Skills go in a group per skill category, passions and runes in their own groups. Dodge and
+ * Spirit Combat are also under Combat.
+ */
 export function buildAbilityActions(abilities: AbilityInfo[], grouped: GroupedActions): void {
   for (const ability of abilities) {
+    const combatGroupId = ability.rqid ? COMBAT_GROUP_BY_RQID[ability.rqid] : undefined;
+    if (combatGroupId) {
+      addTo(grouped, combatGroupId, abilityAction(ability));
+    }
     const groupId =
       ability.type === "skill"
         ? skillGroupId(ability.category ?? "otherSkills")
         : ability.type === "passion"
           ? GROUP.passions.id
           : GROUP.runes.id;
-    addTo(
-      grouped,
-      groupId,
-      action(
-        ACTION_TYPE.ability,
-        ability.id,
-        { name: ability.name, img: ability.img, info1: percent(ability.chance) },
-        { itemUuid: ability.uuid },
-      ),
-    );
+    addTo(grouped, groupId, abilityAction(ability));
   }
+}
+
+function abilityAction(ability: AbilityInfo): TahActionData {
+  return action(
+    ACTION_TYPE.ability,
+    ability.id,
+    { name: ability.name, img: ability.img, info1: percent(ability.chance) },
+    { itemUuid: ability.uuid },
+  );
 }
 
 /** One action per weapon usage. The usage is only added to the name when there is a choice. */
@@ -282,4 +295,24 @@ export function buildStatusEffectActions(
       }),
     );
   }
+}
+
+/** The spirit combat damage roll, after the Spirit Combat skill. "0" means the actor deals none. */
+export function buildSpiritCombatDamageAction(
+  formula: string | null | undefined,
+  localize: Localize,
+  grouped: GroupedActions,
+): void {
+  if (!formula || formula === "0") {
+    return;
+  }
+  addTo(
+    grouped,
+    GROUP.spiritCombat.id,
+    action(ACTION_TYPE.spiritCombatDamage, "spirit-combat-damage", {
+      name: localize("RQG.Actor.Combat.SpiritCombatDamage"),
+      img: null,
+      info1: { text: formula },
+    }),
+  );
 }

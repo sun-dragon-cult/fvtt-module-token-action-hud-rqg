@@ -14,7 +14,13 @@ describe("getDefaults", () => {
       "effects",
       "utility",
     ]);
+    expect(layout[0]?.groups?.map((g) => g.id)).toEqual([
+      "weapons",
+      "combat-skills",
+      "spirit-combat",
+    ]);
     expect(layout[1]?.groups).toHaveLength(12);
+    expect(layout[1]?.groups?.every((g) => g.settings?.style === "tab")).toBe(true);
     expect(layout[2]?.groups?.map((g) => g.nestId)).toEqual([
       "magic_spirit-magic",
       "magic_rune-magic",

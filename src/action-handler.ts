@@ -2,6 +2,7 @@ import {
   buildAbilityActions,
   buildCharacteristicActions,
   buildSpellActions,
+  buildSpiritCombatDamageAction,
   buildStatusEffectActions,
   buildWeaponActions,
   type GroupedActions,
@@ -61,6 +62,7 @@ export function createActionHandler(coreModule: TahCoreModule) {
       );
       buildAbilityActions(abilityInfos(actor), grouped);
       const system = actor.system as CharacterSystemData;
+      buildSpiritCombatDamageAction(system.attributes.spiritCombatDamage, localize, grouped);
       const spellGroups = buildSpellActions(
         (actor as RqgActor).getCastableSpells(),
         spellPoints(actor, system),

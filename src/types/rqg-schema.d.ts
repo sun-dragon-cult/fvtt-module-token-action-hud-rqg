@@ -10,7 +10,7 @@ export type RqgResource = { value: number | null; max: number | null };
 export type CharacterSystemData = {
   characteristics: Record<CharacteristicName, { value: number | null }>;
   background: { reputation: number | null };
-  attributes: { magicPoints: RqgResource };
+  attributes: { magicPoints: RqgResource; spiritCombatDamage: string | null };
 };
 
 export type CultSystemData = { runePoints: RqgResource };
@@ -29,6 +29,7 @@ export type WeaponUsageChanceInfo = {
 
 export type WeaponSystemData = {
   equippedStatus: "notCarried" | "carried" | "equipped";
+  isNatural: boolean;
   usage: Record<UsageType, { skillRqidLink?: { rqid?: string }; strikeRank?: number | null }>;
   getUsageInfo(usage: UsageType): WeaponUsageChanceInfo;
 };

@@ -23,11 +23,16 @@ export function getDefaults(localize: (key: string) => string): TahDefaults {
   });
 
   const layout = [
-    nest("combat", "tokenActionHud.combat", [group(GROUP.weapons, "combat")]),
+    nest("combat", "tokenActionHud.combat", [
+      group(GROUP.weapons, "combat"),
+      group(GROUP.combatSkills, "combat"),
+      group(GROUP.spiritCombat, "combat"),
+    ]),
     nest(
       "skills",
       "tokenActionHud.rqg.skills",
-      SKILL_GROUPS.map((g) => group(g, "skills")),
+      // Tabs, all twelve categories at once make the menu too tall
+      SKILL_GROUPS.map((g) => group(g, "skills", { style: "tab" })),
     ),
     nest("magic", "tokenActionHud.rqg.magic", [
       // Tabs, since rune magic gets a subgroup per cult and spirit magic one per spell source

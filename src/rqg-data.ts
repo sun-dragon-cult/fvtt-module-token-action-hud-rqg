@@ -26,17 +26,20 @@ export function abilityInfos(actor: Actor): AbilityInfo[] {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** One entry per weapon usage that has a linked skill, the ones the attack dialog offers. */
+/**
+ * One entry per weapon usage that has a linked skill, the ones the attack dialog offers. Natural
+ * weapons count as equipped, like in the attack dialog.
+ */
 export function weaponUsageInfos(
   actor: Actor,
   { includeUnequipped }: { includeUnequipped: boolean },
 ): WeaponUsageInfo[] {
   return actor.items.contents
     .filter((item) => item.type === "weapon")
-    .filter(
-      (weapon) =>
-        includeUnequipped || (weapon.system as WeaponSystemData).equippedStatus === "equipped",
-    )
+    .filter((weapon) => {
+      const system = weapon.system as WeaponSystemData;
+      return includeUnequipped || system.equippedStatus === "equipped" || system.isNatural;
+    })
     .sort((a, b) => a.sort - b.sort)
     .flatMap((weapon) => {
       const system = weapon.system as WeaponSystemData;

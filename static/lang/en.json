@@ -2,6 +2,7 @@
   "tokenActionHud": {
     "rqg": {
       "characteristics": "Characteristics",
+      "combatSkills": "Combat Skills",
       "magic": "Magic",
       "passions": "Passions",
       "passionsAndRunes": "Passions & Runes",
