@@ -38,7 +38,7 @@ export function createRollHandler(coreModule: TahCoreModule) {
         return;
       }
 
-      const { rolls } = game.system.api;
+      const { rolls, dialogs } = game.system.api;
       const actorRef = token?.document ?? actor;
       const skipDialog = this.isShift;
 
@@ -86,6 +86,12 @@ export function createRollHandler(coreModule: TahCoreModule) {
           }
           break;
         }
+        case ACTION_TYPE.addWound:
+          await dialogs.addWound(data.actionId, { actor: actorRef });
+          break;
+        case ACTION_TYPE.healWound:
+          await dialogs.healWounds(data.actionId, { actor: actorRef });
+          break;
         case ACTION_TYPE.statusEffect:
           await actor.toggleStatusEffect(data.actionId, { overlay: this.isRightClick });
           Hooks.callAll("forceUpdateTokenActionHud");

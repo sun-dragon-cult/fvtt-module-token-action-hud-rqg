@@ -3,13 +3,14 @@ import {
   buildCharacteristicActions,
   buildSpellActions,
   buildSpiritCombatDamageAction,
+  buildHitLocationActions,
   buildStatusEffectActions,
   buildWeaponActions,
   type GroupedActions,
   type SpellGroups,
   type SpellPoints,
 } from "./build-actions";
-import { abilityInfos, weaponUsageInfos } from "./rqg-data";
+import { abilityInfos, hitLocationInfos, weaponUsageInfos } from "./rqg-data";
 import { getSetting } from "./settings";
 import type { CharacteristicName } from "./types/rqg-api";
 import type { CharacterSystemData, CultSystemData, RqgActor } from "./types/rqg-schema";
@@ -60,6 +61,7 @@ export function createActionHandler(coreModule: TahCoreModule) {
         localize,
         grouped,
       );
+      buildHitLocationActions(hitLocationInfos(actor), grouped);
       buildAbilityActions(abilityInfos(actor), grouped);
       const system = actor.system as CharacterSystemData;
       buildSpiritCombatDamageAction(system.attributes.spiritCombatDamage, localize, grouped);

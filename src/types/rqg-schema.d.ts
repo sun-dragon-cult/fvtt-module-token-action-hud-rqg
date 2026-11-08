@@ -15,6 +15,8 @@ export type CharacterSystemData = {
 
 export type CultSystemData = { runePoints: RqgResource };
 
+export type HitLocationSystemData = { hitPoints: RqgResource; dieFrom: number | null };
+
 export type AbilitySystemData = {
   chance: number | null;
   category?: SkillCategory;

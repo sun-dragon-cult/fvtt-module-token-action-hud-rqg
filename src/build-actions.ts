@@ -9,6 +9,7 @@ import type {
   AbilityInfo,
   CastableSpell,
   CharacteristicName,
+  HitLocationInfo,
   WeaponUsageInfo,
 } from "./types/rqg-api";
 import type { TahActionData, TahInfo } from "./types/tah-core";
@@ -315,4 +316,22 @@ export function buildSpiritCombatDamageAction(
       info1: { text: formula },
     }),
   );
+}
+
+/**
+ * Every hit location, to add a wound, and the wounded ones again under Heal Wounds, through the
+ * character sheet's dialogs.
+ */
+export function buildHitLocationActions(
+  locations: HitLocationInfo[],
+  grouped: GroupedActions,
+): void {
+  for (const location of locations) {
+    const { value, max } = location.hitPoints;
+    const data = { name: location.name, img: location.img, info1: points(value, max) };
+    addTo(grouped, GROUP.addWound.id, action(ACTION_TYPE.addWound, location.id, data));
+    if (value != null && max != null && value < max) {
+      addTo(grouped, GROUP.healWounds.id, action(ACTION_TYPE.healWound, location.id, data));
+    }
+  }
 }

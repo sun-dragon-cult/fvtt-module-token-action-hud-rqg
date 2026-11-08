@@ -27,6 +27,8 @@ export function getDefaults(localize: (key: string) => string): TahDefaults {
       group(GROUP.weapons, "combat"),
       group(GROUP.combatSkills, "combat"),
       group(GROUP.spiritCombat, "combat"),
+      group(GROUP.addWound, "combat"),
+      group(GROUP.healWounds, "combat"),
     ]),
     nest(
       "skills",

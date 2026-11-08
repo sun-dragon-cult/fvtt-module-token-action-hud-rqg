@@ -1,5 +1,15 @@
-import type { AbilityInfo, AbilityType, UsageType, WeaponUsageInfo } from "./types/rqg-api";
-import type { AbilitySystemData, WeaponSystemData } from "./types/rqg-schema";
+import type {
+  AbilityInfo,
+  AbilityType,
+  HitLocationInfo,
+  UsageType,
+  WeaponUsageInfo,
+} from "./types/rqg-api";
+import type {
+  AbilitySystemData,
+  HitLocationSystemData,
+  WeaponSystemData,
+} from "./types/rqg-schema";
 
 const ABILITY_TYPES: readonly string[] = ["skill", "rune", "passion"];
 const USAGE_TYPES: readonly UsageType[] = ["oneHand", "offHand", "twoHand", "missile"];
@@ -62,4 +72,21 @@ export function weaponUsageInfos(
         },
       );
     });
+}
+
+/** Hit locations from the head down, by their hit location roll. */
+export function hitLocationInfos(actor: Actor): HitLocationInfo[] {
+  return actor.items.contents
+    .filter((item) => item.type === "hitLocation")
+    .sort(
+      (a, b) =>
+        ((b.system as HitLocationSystemData).dieFrom ?? 0) -
+        ((a.system as HitLocationSystemData).dieFrom ?? 0),
+    )
+    .map((item) => ({
+      id: item.id,
+      name: item.name,
+      img: item.img,
+      hitPoints: (item.system as HitLocationSystemData).hitPoints,
+    }));
 }

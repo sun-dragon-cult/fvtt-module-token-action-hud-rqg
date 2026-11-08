@@ -18,6 +18,8 @@ describe("getDefaults", () => {
       "weapons",
       "combat-skills",
       "spirit-combat",
+      "add-wound",
+      "heal-wounds",
     ]);
     expect(layout[1]?.groups).toHaveLength(12);
     expect(layout[1]?.groups?.every((g) => g.settings?.style === "tab")).toBe(true);

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { abilityInfos, weaponUsageInfos } from "./rqg-data";
+import { abilityInfos, hitLocationInfos, weaponUsageInfos } from "./rqg-data";
 
 function item(overrides: Record<string, unknown>) {
   return {
@@ -94,5 +94,25 @@ describe("weaponUsageInfos", () => {
     const result = weaponUsageInfos(actor, { includeUnequipped: true });
 
     expect(result.map((u) => u.name)).toEqual(["Axe", "Axe", "Spear", "Spear"]);
+  });
+});
+
+describe("hitLocationInfos", () => {
+  const location = (id: string, dieFrom: number) =>
+    item({
+      id,
+      name: id,
+      type: "hitLocation",
+      system: { dieFrom, hitPoints: { value: 3, max: 5 } },
+    });
+
+  it("lists hit locations from the head down", () => {
+    const actor = actorWith(location("Left Leg", 1), location("Head", 19), location("Chest", 12));
+
+    expect(hitLocationInfos(actor).map((l) => [l.name, l.hitPoints.value])).toEqual([
+      ["Head", 3],
+      ["Chest", 3],
+      ["Left Leg", 3],
+    ]);
   });
 });

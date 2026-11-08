@@ -6,7 +6,8 @@ A [Token Action HUD](https://foundryvtt.com/packages/token-action-hud-core) syst
 Select a token and the HUD shows its:
 
 - **Combat** – equipped and natural weapons, one button per way the weapon can be used, with chance
-  and strike rank; Dodge; Spirit Combat with its damage roll
+  and strike rank; Dodge; Spirit Combat with its damage roll; add a wound to a hit location, and
+  heal the wounded ones
 - **Skills** – one tab per skill category
 - **Magic** – spirit and rune magic, including spells from an Allied Spirit, bound spirits and
   spell matrices
@@ -42,11 +43,11 @@ To load it in Foundry, symlink `dist/` into your Foundry data folder as
 The module's code is in `src/`:
 
 - `main.ts` registers with Token Action HUD Core when Core hands over its API.
-- `rqg-data.ts` reads skills, runes, passions and weapon usages from the character's items, and
-  `build-actions.ts` turns them, the castable spells and the characteristics into HUD actions (both
-  unit tested).
+- `rqg-data.ts` reads skills, runes, passions, weapon usages and hit locations from the character's
+  items, and `build-actions.ts` turns them, the castable spells and the characteristics into HUD
+  actions (both unit tested).
 - `action-handler.ts` and `roll-handler.ts` extend Core's base classes: building the actions, and
-  calling the RQG API's `rolls` when an action is clicked.
+  calling the RQG API's `rolls` and `dialogs` when an action is clicked.
 - `defaults.ts` is the default HUD layout.
 
 Releases are built by publishing a GitHub release with a `vX.Y.Z` tag. The workflow fills in the
