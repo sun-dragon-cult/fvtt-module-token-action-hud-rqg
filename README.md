@@ -14,7 +14,8 @@ Select a token and the HUD shows its:
   points, each cult one showing its rune points.
 - **Passions & Runes**
 - **Characteristics** – characteristic rolls and Reputation
-- **Status Effects** – toggle status effects on the token
+- **Status Effects** – add a spell effect without casting the spell (one token only), and toggle
+  status effects on the token
 - **Utility** – add to combat, toggle visibility
 
 Click an action to open its normal roll dialog, **shift-click** to roll at once without a dialog,

@@ -28,6 +28,7 @@ export const ACTION_TYPE = {
   spiritMagic: "spiritMagic",
   runeMagic: "runeMagic",
   statusEffect: "statusEffect",
+  addSpellEffect: "addSpellEffect",
   spiritCombatDamage: "spiritCombatDamage",
   addWound: "addWound",
   healWound: "healWound",

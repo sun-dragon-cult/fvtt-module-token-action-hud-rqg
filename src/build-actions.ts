@@ -304,6 +304,18 @@ export function buildStatusEffectActions(
   }
 }
 
+/** Puts a spell effect on the actor without casting, first in the status effects like the token HUD */
+export function buildAddSpellEffectAction(localize: Localize, grouped: GroupedActions): void {
+  addTo(
+    grouped,
+    GROUP.statusEffects.id,
+    action(ACTION_TYPE.addSpellEffect, "add-spell-effect", {
+      name: localize("RQG.TokenHud.AddSpellEffect"),
+      img: null,
+    }),
+  );
+}
+
 /** The spirit combat damage roll, after the Spirit Combat skill. "0" means the actor deals none. */
 export function buildSpiritCombatDamageAction(
   formula: string | null | undefined,

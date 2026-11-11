@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildAbilityActions,
+  buildAddSpellEffectAction,
   buildCharacteristicActions,
   buildHitLocationActions,
   buildSpellActions,
@@ -331,6 +332,32 @@ describe("buildStatusEffectActions", () => {
     expect(grouped.get("status-effects")?.map((a) => a.cssClass)).toEqual([
       "toggle active",
       "toggle",
+    ]);
+  });
+});
+
+describe("buildAddSpellEffectAction", () => {
+  it("comes before the status effects", () => {
+    const grouped: GroupedActions = new Map();
+    buildAddSpellEffectAction(localize, grouped);
+    buildStatusEffectActions(
+      [{ id: "prone", name: "EFFECT.StatusProne", img: "prone.svg" }],
+      [{ statuses: new Set() }],
+      localize,
+      grouped,
+    );
+
+    expect(grouped.get("status-effects")?.map((a) => [a.id, a.name, a.system])).toEqual([
+      [
+        "addSpellEffect-add-spell-effect",
+        "[RQG.TokenHud.AddSpellEffect]",
+        { actionType: "addSpellEffect", actionId: "add-spell-effect" },
+      ],
+      [
+        "statusEffect-prone",
+        "[EFFECT.StatusProne]",
+        { actionType: "statusEffect", actionId: "prone" },
+      ],
     ]);
   });
 });
