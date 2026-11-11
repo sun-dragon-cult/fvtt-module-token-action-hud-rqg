@@ -47,7 +47,7 @@ export type RqgActionSystemData = {
 
 /** Group ids and the translation keys of their names */
 export const GROUP = {
-  weapons: { id: "weapons", name: "tokenActionHud.rqg.weapons" },
+  weapons: { id: "weapons", name: "tokenActionHud.rqg.attacks" },
   combatSkills: { id: "combat-skills", name: "tokenActionHud.rqg.combatSkills" },
   spiritCombat: { id: "spirit-combat", name: "RQG.Actor.Combat.SpiritCombat" },
   addWound: { id: "add-wound", name: "tokenActionHud.rqg.addWound" },

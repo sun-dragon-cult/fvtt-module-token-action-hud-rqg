@@ -5,9 +5,9 @@ A [Token Action HUD](https://foundryvtt.com/packages/token-action-hud-core) syst
 
 Select a token and the HUD shows its:
 
-- **Combat** – equipped and natural weapons, one button per way the weapon can be used, with chance
-  and strike rank; Dodge; Spirit Combat with its damage roll; add a wound to a hit location, and
-  heal the wounded ones
+- **Combat** – attacks with equipped and natural weapons, one button per way the weapon can be used,
+  with chance and strike rank; Dodge; Spirit Combat with its damage roll; add a wound to a hit
+  location, and heal the wounded ones
 - **Skills** – one tab per skill category
 - **Magic** – spirit and rune magic, including spells from an Allied Spirit, bound spirits and
   spell matrices. Each Allied Spirit and bound spirit gets its own group showing the spirit's magic

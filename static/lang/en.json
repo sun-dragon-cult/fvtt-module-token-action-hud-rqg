@@ -2,6 +2,7 @@
   "tokenActionHud": {
     "rqg": {
       "addWound": "Add Wound",
+      "attacks": "Attacks",
       "characteristics": "Characteristics",
       "combatSkills": "Combat Skills",
       "healWounds": "Heal Wounds",
@@ -11,7 +12,6 @@
       "runes": "Runes",
       "skills": "Skills",
       "statusEffects": "Status Effects",
-      "weapons": "Weapons",
       "weaponUnusable": "Below the STR or DEX requirement for this use of the weapon",
       "settings": {
         "showUnequippedWeapons": {
