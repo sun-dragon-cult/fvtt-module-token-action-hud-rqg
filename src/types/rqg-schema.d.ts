@@ -46,4 +46,6 @@ export type WeaponSystemData = {
 export type RqgActor = Actor & {
   getCastableSpells(): Promise<CastableSpell[]>;
   getMagicPointSources(): MagicPointSource[];
+  /** Opens the Add a Spell Effect dialog; true when the actor's effects changed */
+  addSpellEffect(options?: { token?: TokenDocument | null }): Promise<boolean>;
 };

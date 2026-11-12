@@ -1,5 +1,6 @@
 import {
   buildAbilityActions,
+  buildAddSpellEffectAction,
   buildCharacteristicActions,
   buildSpellActions,
   buildSpiritCombatDamageAction,
@@ -82,6 +83,7 @@ export function createActionHandler(coreModule: TahCoreModule) {
         localize,
         grouped,
       );
+      buildAddSpellEffectAction(localize, grouped);
       buildStatusEffectActions(CONFIG.statusEffects, [actor], localize, grouped);
     }
 

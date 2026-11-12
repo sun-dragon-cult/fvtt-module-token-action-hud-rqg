@@ -96,6 +96,11 @@ export function createRollHandler(coreModule: TahCoreModule) {
           await actor.toggleStatusEffect(data.actionId, { overlay: this.isRightClick });
           Hooks.callAll("forceUpdateTokenActionHud");
           break;
+        case ACTION_TYPE.addSpellEffect:
+          if (await (actor as RqgActor).addSpellEffect({ token: token?.document })) {
+            Hooks.callAll("forceUpdateTokenActionHud");
+          }
+          break;
       }
     }
   };
